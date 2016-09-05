@@ -77,6 +77,8 @@
 #include "p_maputl.h"
 #include "p_spec.h"
 #include "math/cmath.h"
+#include "gl/models/gl_models.h" // jitan
+//#include "gl/models/gl_models.cpp"
 
 AActor *SingleActorFromTID(int tid, AActor *defactor);
 
@@ -3181,6 +3183,55 @@ DEFINE_ACTION_FUNCTION_PARAMS(AActor, A_Print)
 	return 0;
 }
 
+DEFINE_ACTION_FUNCTION_PARAMS(AActor, A_ReplaceModel) //jitan
+{
+	PARAM_SELF_PROLOGUE(AActor); //jitan
+	PARAM_INT(ModelIndex); //model index //jitan
+	PARAM_STRING(ModelPATH); //actor name//jitan 
+	PARAM_STRING(ModelMD3); //actor name //jitan
+	if (self->hasmodel) // zombie killer
+	{
+		FString ModelName(ModelMD3); // partially jitan and zombie killer
+		FString PathModel(ModelPATH); // partially jitan and zombie killer
+		FModel *FindModel(const char * path, const char * modelfile); // jitan
+		FSpriteModelFrame *smf = gl_FindModelFrame(self->GetClass(), self->state->sprite, self->state->GetFrame(), false); // partially jitan and zombie killer
+		//smf->modelIDs[ModelIndex] = -1;
+		//unsigned int FindModel(const char * path, const char * modelfile);
+		smf->modelIDs[ModelIndex] = FindModel(PathModel, ModelName);
+			
+	}
+	return 0;
+}
+
+//===========================================================================
+//// jitan make this
+// A_ReplaceModelSkin
+//
+// Replace The Model Skin
+// Example
+// If Model texture PLAY A = Green.png
+// Calling this Def correctly will replace Model Texture PLAY A = Red.png
+//===========================================================================
+
+DEFINE_ACTION_FUNCTION_PARAMS(AActor, A_ReplaceModelSkin) //jitan
+{
+	PARAM_SELF_PROLOGUE(AActor);  // jitan
+	PARAM_INT(ModelIndex); //model index /jitan
+	PARAM_STRING(TexPath);// texture path example "Models/red/" partially jitan and zombie killer
+	PARAM_STRING(TexName);// texturename example "red.png" partially jitan and zombie killer
+	if (self->hasmodel) //zombiekiller
+	{
+		FString SkinPath(TexPath); //partially jitan and zombie killer
+		FString SkinName(TexName); //partially jitan and zombie killer
+		FSpriteModelFrame *smf = gl_FindModelFrame(self->GetClass(), self->state->sprite, self->state->GetFrame(), false);	
+		//smf.skinIDs[index] = LoadSkin(path.GetChars(), sc.String);
+		//smf->skinIDs[ModelIndex] = LoadSkin(FString(SkinPath).GetChars(), SkinName);
+		smf->skinIDs[ModelIndex] = LoadSkin(SkinPath, SkinName);
+		//smf->skinIDs[ModelIndex] = LoadSkin("MODELS/red/", "cloth.png");
+	}
+	return 0;
+}
+
 //===========================================================================
 //
 // A_PrintBold
@@ -5596,7 +5647,7 @@ DEFINE_ACTION_FUNCTION_PARAMS(AActor, A_WolfAttack)
 
 	// Target can dodge if it can see enemy
 	DAngle angle = absangle(self->target->Angles.Yaw, self->target->AngleTo(self));
-	bool dodge = (P_CheckSight(self->target, self) && angle < 30. * 256. / 360.);	// 30 byteangles ~ 21°
+	bool dodge = (P_CheckSight(self->target, self) && angle < 30. * 256. / 360.);	// 30 byteangles ~ 21Â°
 
 	// Distance check is simplistic
 	DVector2 vec = self->Vec2To(self->target);
