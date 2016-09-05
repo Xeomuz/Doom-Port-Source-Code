@@ -387,7 +387,7 @@ static int ModelFrameHash(FSpriteModelFrame * smf)
 //
 //===========================================================================
 
-static unsigned FindModel(const char * path, const char * modelfile)
+ unsigned FindModel(const char * path, const char * modelfile)
 {
 	FModel * model = nullptr;
 	FString fullname;
